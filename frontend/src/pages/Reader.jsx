@@ -12,8 +12,10 @@ export default function Reader() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [fontSize, setFontSize] = useState(17);
+  const [showChapters, setShowChapters] = useState(false);
   const bookRef = useRef(null);
   const recorded = useRef('');
+  const drawerListRef = useRef(null);
 
   useEffect(() => {
     setLoading(true);
@@ -54,7 +56,13 @@ export default function Reader() {
   useEffect(() => {
     const bk = bookRef.current;
     if (!bk) return;
-    const idx = chapters.findIndex((c) => c.id === chapterId);
+  useEffect(() => {
+    if (!showChapters) return;
+    const el = drawerListRef.current?.querySelector('.drawer-item.active');
+    el?.scrollIntoView({ block: 'center' });
+  }, [showChapters]);
+
+  const idx = chapters.findIndex((c) => c.id === chapterId);
     if (idx < 0) return;
     const chapterTitle = stripHtml(chapters[idx].title);
     if (recorded.current === chapterId) return;
@@ -84,6 +92,7 @@ export default function Reader() {
           <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{bookTitle}</span>
           <div>
             <Link className="page-btn" to="/shelf" style={{ marginTop: 0, marginRight: 8 }}>书架</Link>
+            <button className="page-btn" style={{ marginTop: 0, marginRight: 8 }} onClick={() => setShowChapters(true)}>目录</button>
             <button className="page-btn" style={{ marginTop: 0, marginRight: 8 }} onClick={() => setFontSize(Math.max(13, fontSize - 1))}>A-</button>
             <button className="page-btn" style={{ marginTop: 0 }} onClick={() => setFontSize(Math.min(28, fontSize + 1))}>A+</button>
           </div>
@@ -110,6 +119,33 @@ export default function Reader() {
           </>
         )}
       </div>
+
+      {showChapters && (
+        <>
+          <div className="reader-mask" onClick={() => setShowChapters(false)} />
+          <div className="reader-drawer">
+            <div className="drawer-head">
+              <span>目录（{chapters.length} 章）</span>
+              <button onClick={() => setShowChapters(false)} aria-label="关闭目录">×</button>
+            </div>
+            <div className="drawer-list" ref={drawerListRef}>
+              {chapters.map((c) => (
+                <div
+                  key={c.id}
+                  className={`drawer-item${String(c.id) === String(chapterId) ? ' active' : ''}`}
+                  onClick={() => {
+                    setShowChapters(false);
+                    navigate(`/read/${bookId}/${c.id}`);
+                  }}
+                  title={stripHtml(c.title)}
+                >
+                  {stripHtml(c.title)}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

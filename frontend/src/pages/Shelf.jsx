@@ -4,12 +4,13 @@ import { getShelf, getHistory, removeFromShelf, removeFromHistory, clearHistory 
 import { stripHtml } from '../utils.js';
 
 function BookRow({ book, onOpen, onRemove }) {
+  const openDetail = () => onOpen();
   return (
     <div className="row-card">
-      <div className="row-cover" onClick={onOpen}>
+      <div className="row-cover" onClick={openDetail}>
         {book.image_link ? <img src={book.image_link} alt={stripHtml(book.title)} loading="lazy" /> : null}
       </div>
-      <div className="row-info" onClick={onOpen}>
+      <div className="row-info" onClick={openDetail}>
         <div className="row-title">{stripHtml(book.title)}</div>
         <div className="row-author">{book.author}</div>
         <div className="row-progress">
@@ -27,7 +28,7 @@ function BookRow({ book, onOpen, onRemove }) {
           继续阅读
         </button>
       ) : (
-        <button className="row-action" onClick={onOpen}>查看</button>
+        <button className="row-action" onClick={openDetail}>查看</button>
       )}
       {onRemove && (
         <button className="row-action danger" onClick={() => onRemove(book)}>

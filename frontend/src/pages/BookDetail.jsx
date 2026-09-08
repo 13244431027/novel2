@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { stripHtml, fmtWord, fmtScore } from '../utils.js';
-import { isInShelf, addToShelf, removeFromShelf } from '../storage.js';
+import { isInShelf, addToShelf, removeFromShelf, getLastRead } from '../storage.js';
 
 export default function BookDetail() {
   const { id } = useParams();
@@ -36,6 +36,12 @@ export default function BookDetail() {
 
   const firstChapter = chapters[0];
   const lastChapter = chapters[chapters.length - 1];
+  const lastRead = getLastRead(id);
+  const hasProgress =
+    !!lastRead?.chapter_id &&
+    chapters.some((c) => String(c.id) === String(lastRead.chapter_id));
+  const startChapterId = hasProgress ? lastRead.chapter_id : firstChapter?.id;
+  const startLabel = hasProgress ? '继续阅读' : '开始阅读';
   const tags = Array.isArray(book.book_tag_list)
     ? book.book_tag_list.map((t) => t.title).filter(Boolean)
     : [];
@@ -90,12 +96,12 @@ export default function BookDetail() {
               {book.intro ? stripHtml(book.intro) : '暂无简介'}
             </div>
             <div className="detail-btns">
-              {firstChapter && (
+              {startChapterId && (
                 <button
                   className="read-btn"
-                  onClick={() => navigate(`/read/${id}/${firstChapter.id}`)}
+                  onClick={() => navigate(`/read/${id}/${startChapterId}`)}
                 >
-                  开始阅读
+                  {startLabel}
                 </button>
               )}
               {lastChapter && lastChapter.id !== firstChapter.id && (

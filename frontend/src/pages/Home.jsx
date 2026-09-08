@@ -40,7 +40,7 @@ export default function Home() {
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       setBooks(data.books || []);
-      setTotalPage(Math.max(1, Math.ceil((data.meta?.total || 1) / 10)));
+      setTotalPage(Math.max(1, Number(data.meta?.total_pages || 1)));
     } catch (e) {
       setError(e.message);
     } finally {

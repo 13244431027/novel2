@@ -17,12 +17,12 @@ export default function Search() {
     if (!wd) return;
     setLoading(true);
     setError('');
-    fetch(`/api/search?wd=${encodeURIComponent(wd)}&page=${page}`)
+    fetch(`/api/search?wd=${encodeURIComponent(wd)}&page=${page - 1}`)
       .then((r) => r.json())
       .then((data) => {
         if (data.error) throw new Error(data.error);
         setBooks(data.books || []);
-        setTotalPage(Math.max(1, Math.ceil((data.meta?.total_page || 1) / 10)));
+        setTotalPage(Math.max(1, Number(data.meta?.total_page || 1)));
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
