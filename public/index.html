@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="基于 qimao.json 书源的在线小说阅读网站，支持搜索、分类浏览、书架与沉浸式阅读。">
+  <title>在线书城 · 多源小说阅读</title>
+  <link rel="icon" href="data:,">
+  <link rel="preconnect" href="https://cdn.wtzw.com">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#/">在线<span>书城</span></a>
+      <form class="search" id="searchForm">
+        <input id="searchInput" type="search" placeholder="搜索书名、作者" autocomplete="off">
+        <button type="submit">搜索</button>
+      </form>
+      <nav class="nav">
+        <label class="source-picker">
+          <span>书源</span>
+          <select id="sourceSelect" aria-label="选择书源"></select>
+        </label>
+        <a href="#/shelf">书架</a>
+        <button class="icon-btn" id="themeBtn" title="切换深色模式" aria-label="切换深色模式">☾</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="view"></main>
+
+  <div id="reader">
+    <div class="reader-bar top">
+      <button id="readerBack" aria-label="返回上一页">返回</button>
+      <div class="title" id="readerTitle">加载中…</div>
+      <button id="readerCatalogBtn" aria-label="打开目录">目录</button>
+    </div>
+    <div class="reader-body" id="readerBody"></div>
+    <div class="reader-bar bottom">
+      <button id="readerPrev" aria-label="上一章">上一章</button>
+      <button id="readerSettingsBtn" aria-label="阅读设置">设置</button>
+      <button id="readerNext" aria-label="下一章">下一章</button>
+    </div>
+    <div class="reader-settings" id="readerSettings"></div>
+  </div>
+
+  <div class="drawer" id="catalogDrawer">
+    <div class="drawer-mask" data-close></div>
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <input id="catalogSearch" placeholder="搜索章节" autocomplete="off">
+        <button data-close>×</button>
+      </div>
+      <div class="drawer-body" id="catalogBody"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
