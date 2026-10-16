@@ -341,6 +341,7 @@ export async function getChapters(bookId) {
           title: stripTags(chapter.cN) || `第${index + 1}章`,
           words: Number(chapter.cnt) || 0,
           index: index++,
+          vip: Number(chapter.sS) === 0,
         });
       }
     }
@@ -353,8 +354,18 @@ export async function getChapterContent(bookId, chapterId) {
     const html = await requestText(`${MOBILE_HOST}/chapter/${encodeURIComponent(bookId)}/${encodeURIComponent(chapterId)}/`);
     const data = readPageData(html) || {};
     const chapter = data.chapterInfo || {};
-    const content = chapter.content;
+    const content = cleanContent(chapter.content);
     if (!content) throw new Error('本章为 VIP 或受限章节，当前书源仅支持公开章节阅读');
-    return cleanContent(content);
+    const actualWords = Number(chapter.actualWords) || Number(chapter.wordsCount) || 0;
+    const vipStatus = Number(chapter.vipStatus);
+    const price = Number(chapter.price) || 0;
+    const compactLen = content.replace(/\s/g, '').length;
+    const truncatedPreview =
+      (actualWords > 500 && compactLen < actualWords * 0.25) ||
+      (vipStatus === 1 && price > 0 && compactLen < 300);
+    if (truncatedPreview) {
+      throw new Error('本章为 VIP 或受限章节，当前书源仅支持公开章节阅读');
+    }
+    return content;
   });
 }

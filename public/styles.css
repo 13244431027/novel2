@@ -522,6 +522,18 @@ main {
   text-overflow: ellipsis;
 }
 
+.chapter-list a .vip {
+  flex: none;
+  min-width: auto;
+  padding: 1px 5px;
+  margin-left: 2px;
+  font-size: 10px;
+  line-height: 1.4;
+  border-radius: 4px;
+  color: #fff;
+  background: var(--vip-badge, #d33a2c);
+}
+
 .chapter-list a .w {
   margin-left: auto;
   font-size: 11px;

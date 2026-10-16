@@ -65,6 +65,36 @@ const PUBLISH_CATEGORIES = [
 
 const PUBLISH_TAGS = [['影视原著', 539]];
 
+const HONGXIU_MALE = [
+  ['玄幻', 20001], ['奇幻', 20005], ['武侠', 20010], ['仙侠', 20014], ['都市', 20019],
+  ['现实', 20065], ['历史', 20028], ['军事', 20032], ['游戏', 20050], ['体育', 20054],
+  ['科幻', 20042], ['悬疑', 20037], ['轻小说', 20059], ['短篇', 20076],
+];
+
+const HONGXIU_FEMALE = [
+  ['现代言情', 30020], ['古代言情', 30013], ['浪漫青春', 30031], ['玄幻言情', 30001],
+  ['仙侠奇缘', 30008], ['悬疑', 30036], ['科幻空间', 30042], ['游戏竞技', 30050],
+  ['短篇小说', 30083], ['轻小说', 30055],
+];
+
+const FALOO_CATEGORIES = [
+  ['玄幻奇幻', 1], ['武侠仙侠', 6], ['同人小说', 44], ['都市言情', 4], ['军事历史', 3],
+  ['科幻网游', 2], ['恐怖灵异', 5], ['青春校园', 7], ['女生小说', 54], ['轻小说', 97], ['短篇其他', 9],
+];
+
+function catSections(list) {
+  return list.map(([name, id]) => ({ name, kind: 'category', id: `${id}:0` }));
+}
+
+const HONGXIU_SECTIONS = [
+  { key: 'male', name: '男生', items: catSections(HONGXIU_MALE) },
+  { key: 'female', name: '女生', items: [...catSections(HONGXIU_FEMALE), { name: '完本', kind: 'finish', id: 'finish' }] },
+];
+
+const FALOO_SECTIONS = [
+  { key: 'category', name: '分类', items: catSections(FALOO_CATEGORIES) },
+];
+
 function categories(list) {
   return list.map(([name, id, needCategory]) => ({ name, id, kind: 'category', needCategory: needCategory ? 1 : 0 }));
 }
@@ -162,6 +192,20 @@ export function loadSources() {
     signKey: primary.signKey,
     sections: SECTIONS,
   }];
+  sources.push({
+    id: 'hongxiu',
+    name: '红袖读书',
+    group: '网页源',
+    url: 'https://m.hongxiu.com',
+    sections: HONGXIU_SECTIONS,
+  });
+  sources.push({
+    id: 'faloo',
+    name: '飞卢小说',
+    group: '网页源',
+    url: 'https://wap.faloo.com',
+    sections: FALOO_SECTIONS,
+  });
   try {
     const config = JSON.parse(fs.readFileSync(QIDIAN_FILE, 'utf8'));
     const sections = buildQidianSections(config);

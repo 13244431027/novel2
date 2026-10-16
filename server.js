@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url';
 import { loadSources } from './src/booksource.js';
 import * as qimao from './src/qimao.js';
 import * as qidian from './src/qidian.js';
+import * as hongxiu from './src/hongxiu.js';
+import * as faloo from './src/faloo.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -75,8 +77,10 @@ function resolveSourceId(value) {
   return DEFAULT_SOURCE_ID;
 }
 
+const PROVIDERS = { qimao, qidian, hongxiu, faloo };
+
 function providerOf(sourceId) {
-  return sourceId === 'qidian' ? qidian : qimao;
+  return PROVIDERS[sourceId] || qimao;
 }
 
 function parseBookId(raw, fallbackSourceId) {
@@ -131,17 +135,10 @@ async function handleApi(req, res, url) {
     const kind = params.get('kind') || 'category';
     const id = params.get('id');
     if (!id) return sendJson(res, req, 400, { error: '分类参数无效' });
+    if (sourceId === 'qimao' && !isNumeric(id)) return sendJson(res, req, 400, { error: '分类参数无效' });
     const page = clampPage(params.get('page'));
-    let result;
-    if (sourceId === 'qidian') {
-      result = await qidian.list(kind, id, page);
-    } else if (kind === 'tag') {
-      if (!isNumeric(id)) return sendJson(res, req, 400, { error: '分类参数无效' });
-      result = await qimao.listByTag(id, page);
-    } else {
-      if (!isNumeric(id)) return sendJson(res, req, 400, { error: '分类参数无效' });
-      result = await qimao.listByCategory(id, page, Number(params.get('need')) ? 1 : 0);
-    }
+    const need = Number(params.get('need')) ? 1 : 0;
+    const result = await providerOf(sourceId).list(kind, id, page, need);
     return sendJson(res, req, 200, wrapResult(sourceId, result));
   }
 

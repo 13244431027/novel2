@@ -441,6 +441,7 @@
       '<a href="#/read/' + esc(chapter.bookId || '') + '/' + esc(chapter.id) + '" data-cid="' + esc(chapter.id) +
       '" class="' + (chapter.id === currentId ? 'current' : '') + '">' +
       '<span>' + esc(chapter.title) + '</span>' +
+      (chapter.vip ? '<span class="vip">VIP</span>' : '') +
       '<span class="w">' + (chapter.words ? chapter.words + '字' : '') + '</span></a>'
     );
   }

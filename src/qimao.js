@@ -177,6 +177,11 @@ export async function listByTag(tagId, page = 1) {
   };
 }
 
+export async function list(kind, id, page = 1, need = 1) {
+  if (kind === 'tag') return listByTag(id, page);
+  return listByCategory(id, page, need);
+}
+
 export async function getBook(id) {
   return cached(`book:${id}`, 10 * 60 * 1000, async () => {
     const params = { id, imei_ip: '2937357107', teeny_mode: 0 };
@@ -212,6 +217,7 @@ export async function getChapters(bookId) {
       title: c.title || `第${i + 1}章`,
       words: Number(c.words) || 0,
       index: i,
+      vip: false,
     }));
   });
 }
