@@ -99,6 +99,19 @@ async function cached(key, ttlMs, producer) {
   return promise;
 }
 
+async function withConcurrency(items, limit, worker) {
+  const results = new Array(items.length);
+  let next = 0;
+  const queue = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (next < items.length) {
+      const index = next++;
+      results[index] = await worker(items[index], index);
+    }
+  });
+  await Promise.all(queue);
+  return results;
+}
+
 export async function search(keyword, page = 1) {
   const html = await requestText(`${HOST}/plus/search.php?q=${encodeURIComponent(keyword)}`);
   const list = [];
@@ -122,6 +135,11 @@ export async function search(keyword, page = 1) {
       score: '',
     });
   }
+  await withConcurrency(list.filter((item) => !item.cover), 5, (item) =>
+    getBook(item.id).then((book) => {
+      if (book.cover) item.cover = book.cover;
+    }).catch(() => {})
+  );
   return { list, totalPages: 1, page: 1 };
 }
 
