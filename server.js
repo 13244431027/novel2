@@ -8,6 +8,8 @@ import * as qimao from './src/qimao.js';
 import * as qidian from './src/qidian.js';
 import * as hongxiu from './src/hongxiu.js';
 import * as faloo from './src/faloo.js';
+import * as dbxsd from './src/dbxsd.js';
+import * as kuwo from './src/kuwo.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -77,10 +79,14 @@ function resolveSourceId(value) {
   return DEFAULT_SOURCE_ID;
 }
 
-const PROVIDERS = { qimao, qidian, hongxiu, faloo };
+const PROVIDERS = { qimao, qidian, hongxiu, faloo, dbxsd, kuwo };
 
 function providerOf(sourceId) {
   return PROVIDERS[sourceId] || qimao;
+}
+
+function allowsSlugId(sourceId) {
+  return sourceId === 'dbxsd';
 }
 
 function parseBookId(raw, fallbackSourceId) {
@@ -145,7 +151,7 @@ async function handleApi(req, res, url) {
   if (url.pathname === '/api/book') {
     const fallback = resolveSourceId(params.get('source'));
     const target = parseBookId(params.get('id'), fallback);
-    if (!isNumeric(target.id)) return sendJson(res, req, 400, { error: '书籍参数无效' });
+    if (!allowsSlugId(target.sourceId) && !isNumeric(target.id)) return sendJson(res, req, 400, { error: '书籍参数无效' });
     const book = await providerOf(target.sourceId).getBook(target.id);
     return sendJson(res, req, 200, { book: wrapBook(target.sourceId, book) });
   }
@@ -153,7 +159,7 @@ async function handleApi(req, res, url) {
   if (url.pathname === '/api/chapters') {
     const fallback = resolveSourceId(params.get('source'));
     const target = parseBookId(params.get('id'), fallback);
-    if (!isNumeric(target.id)) return sendJson(res, req, 400, { error: '书籍参数无效' });
+    if (!allowsSlugId(target.sourceId) && !isNumeric(target.id)) return sendJson(res, req, 400, { error: '书籍参数无效' });
     const chapters = await providerOf(target.sourceId).getChapters(target.id);
     return sendJson(res, req, 200, { chapters });
   }
@@ -162,7 +168,7 @@ async function handleApi(req, res, url) {
     const fallback = resolveSourceId(params.get('source'));
     const target = parseBookId(params.get('id'), fallback);
     const chapterId = params.get('chapterId');
-    if (!isNumeric(target.id) || !isNumeric(chapterId)) return sendJson(res, req, 400, { error: '章节参数无效' });
+    if ((!allowsSlugId(target.sourceId) && !isNumeric(target.id)) || !isNumeric(chapterId)) return sendJson(res, req, 400, { error: '章节参数无效' });
     const content = await providerOf(target.sourceId).getChapterContent(target.id, chapterId);
     return sendJson(res, req, 200, { content });
   }

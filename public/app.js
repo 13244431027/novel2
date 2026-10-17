@@ -248,7 +248,9 @@
 
   function renderHome() {
     if (!currentSection()) {
-      view.innerHTML = '<div class="empty">书源配置加载失败，请刷新重试</div>';
+      view.innerHTML = state.sources.length
+        ? '<div class="empty">当前书源暂不支持分类浏览，请使用顶部搜索找书</div>'
+        : '<div class="empty">书源配置加载失败，请刷新重试</div>';
       return;
     }
     view.innerHTML =

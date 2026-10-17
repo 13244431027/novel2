@@ -95,6 +95,22 @@ const FALOO_SECTIONS = [
   { key: 'category', name: '分类', items: catSections(FALOO_CATEGORIES) },
 ];
 
+const DBXSD_CATEGORIES = [
+  ['玄幻·奇幻', 'xh-qh'], ['科幻·游戏', 'kh-yx'], ['仙侠·武侠', 'xx-wx'], ['女生·言情', 'ns-yq'],
+  ['都市·娱乐', 'ds-yl'], ['历史·军事', 'ls-js'], ['悬疑·灵异', 'xy-ly'], ['耽美·纯爱', 'dm-ca'],
+  ['轻小说', 'qxs'],
+];
+
+const DBXSD_SECTIONS = [
+  {
+    key: 'category',
+    name: '分类',
+    items: DBXSD_CATEGORIES.map(([name, id]) => ({ name, kind: 'category', id })),
+  },
+];
+
+const KUWO_SECTIONS = [];
+
 function categories(list) {
   return list.map(([name, id, needCategory]) => ({ name, id, kind: 'category', needCategory: needCategory ? 1 : 0 }));
 }
@@ -205,6 +221,20 @@ export function loadSources() {
     group: '网页源',
     url: 'https://wap.faloo.com',
     sections: FALOO_SECTIONS,
+  });
+  sources.push({
+    id: 'dbxsd',
+    name: '独步小说网',
+    group: '网页源',
+    url: 'https://www.dbxsd.com',
+    sections: DBXSD_SECTIONS,
+  });
+  sources.push({
+    id: 'kuwo',
+    name: '酷我小说',
+    group: 'API',
+    url: 'http://appi.kuwo.cn',
+    sections: KUWO_SECTIONS,
   });
   try {
     const config = JSON.parse(fs.readFileSync(QIDIAN_FILE, 'utf8'));
