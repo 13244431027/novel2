@@ -89,6 +89,69 @@ function allowsSlugId(sourceId) {
   return sourceId === 'dbxsd';
 }
 
+const COVER_HOSTS = new Set([
+  'cdn.wtzw.com',
+  'bookcover.yuewen.com',
+  'openbookcover.yuewen.com',
+  'img.faloo.com',
+  'www.dbxsd.com',
+]);
+
+const coverCache = new Map();
+const COVER_CACHE_MAX = 800;
+const COVER_UA = 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36';
+
+function respondCover(res, req, entry) {
+  res.writeHead(200, {
+    'Content-Type': entry.type,
+    'Content-Length': entry.body.length,
+    'Cache-Control': 'public, max-age=604800',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  res.end(req.method === 'HEAD' ? undefined : entry.body);
+}
+
+async function handleCover(req, res, url) {
+  let target;
+  try {
+    target = new URL(url.searchParams.get('u') || '');
+  } catch {
+    return sendJson(res, req, 400, { error: '封面参数无效' });
+  }
+  if (!COVER_HOSTS.has(target.hostname)) return sendJson(res, req, 400, { error: '封面域名不受支持' });
+  const key = target.toString();
+  const hit = coverCache.get(key);
+  if (hit) {
+    coverCache.delete(key);
+    coverCache.set(key, hit);
+    return respondCover(res, req, hit);
+  }
+  try {
+    const upstream = await fetch(key, {
+      headers: {
+        'user-agent': COVER_UA,
+        'accept': 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8',
+        'referer': `${target.protocol}//${target.hostname}/`,
+      },
+      signal: AbortSignal.timeout(15000),
+    });
+    const type = (upstream.headers.get('content-type') || '').split(';')[0].trim();
+    if (!upstream.ok || !type.startsWith('image/')) {
+      return sendJson(res, req, 502, { error: '封面获取失败' });
+    }
+    const body = Buffer.from(await upstream.arrayBuffer());
+    if (!body.length || body.length > 3 * 1024 * 1024) {
+      return sendJson(res, req, 502, { error: '封面获取失败' });
+    }
+    const entry = { body, type };
+    coverCache.set(key, entry);
+    if (coverCache.size > COVER_CACHE_MAX) coverCache.delete(coverCache.keys().next().value);
+    return respondCover(res, req, entry);
+  } catch {
+    return sendJson(res, req, 502, { error: '封面获取失败' });
+  }
+}
+
 function parseBookId(raw, fallbackSourceId) {
   const value = String(raw || '');
   const index = value.indexOf(':');
@@ -171,6 +234,10 @@ async function handleApi(req, res, url) {
     if ((!allowsSlugId(target.sourceId) && !isNumeric(target.id)) || !isNumeric(chapterId)) return sendJson(res, req, 400, { error: '章节参数无效' });
     const content = await providerOf(target.sourceId).getChapterContent(target.id, chapterId);
     return sendJson(res, req, 200, { content });
+  }
+
+  if (url.pathname === '/api/cover') {
+    return await handleCover(req, res, url);
   }
 
   return sendJson(res, req, 404, { error: '接口不存在' });

@@ -168,7 +168,7 @@
   function coverImg(book) {
     if (!book.cover) return '';
     return (
-      '<img src="' + esc(book.cover) + '" alt="' + esc(book.title) +
+      '<img src="/api/cover?u=' + encodeURIComponent(book.cover) + '" alt="' + esc(book.title) +
       '" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display=\'none\'">'
     );
   }
