@@ -30,6 +30,21 @@ npm start
 
 打开 http://localhost:3000 即可使用。
 
+## 部署（远程实例）
+
+实例 `124.81.137.137`（2 核 2G，rootless Docker，无 sudo，无 Node）：
+
+```bash
+# 拉取镜像并构建（在远程执行）
+docker pull node:20-alpine
+docker build -t novel-app:latest .
+
+# 以 host 网络模式启动，监听 3100 端口（3000 / 3001 已被平台服务占用）
+docker run -d --name novel-app --network host -e PORT=3100 --restart unless-stopped novel-app:latest
+```
+
+必须使用 `--network host`：rootless Docker 的 `-p` 端口映射只在容器网络命名空间内生效，宿主机无法访问。访问地址：`http://124.81.137.137:3100`
+
 ## 目录结构
 
 ```
