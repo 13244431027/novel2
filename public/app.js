@@ -41,7 +41,11 @@
   var FONT_STACKS = {
     serif: '"Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif',
     sans: '"PingFang SC", "Microsoft YaHei", "Heiti SC", "Hiragino Sans GB", sans-serif',
-    kai: '"Kaiti SC", "KaiTi", "STKaiti", "Songti SC", serif'
+    kai: '"Kaiti SC", "KaiTi", "STKaiti", "Songti SC", serif',
+    fangsong: '"FangSong", "STFangsong", "FangSong_GB2312", "Noto Serif SC", serif',
+    yuan: '"PingFang SC", "Microsoft YaHei", "Yuanti SC", "YouYuan", "MV Boli", sans-serif',
+    yahei: '"Microsoft YaHei", "PingFang SC", "Heiti SC", "Hiragino Sans GB", sans-serif',
+    song: '"Source Han Serif SC", "Noto Serif SC", "Songti SC", "SimSun", serif'
   };
 
   var WIDTHS = { narrow: '620px', medium: '720px', wide: '880px' };
@@ -784,7 +788,11 @@
     var fontOptions = [
       { key: 'serif', label: '宋体' },
       { key: 'sans', label: '黑体' },
-      { key: 'kai', label: '楷体' }
+      { key: 'kai', label: '楷体' },
+      { key: 'fangsong', label: '仿宋' },
+      { key: 'yuan', label: '圆体' },
+      { key: 'yahei', label: '微软雅黑' },
+      { key: 'song', label: '思源宋体' }
     ];
     var widthOptions = [
       { key: 'narrow', label: '窄' },

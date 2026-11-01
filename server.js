@@ -5,11 +5,9 @@ import zlib from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { loadSources } from './src/booksource.js';
 import * as qimao from './src/qimao.js';
-import * as qidian from './src/qidian.js';
-import * as hongxiu from './src/hongxiu.js';
-import * as faloo from './src/faloo.js';
-import * as dbxsd from './src/dbxsd.js';
-import * as kuwo from './src/kuwo.js';
+import * as shoujixs from './src/shoujixs.js';
+import * as byqg from './src/byqg.js';
+import * as bqgz from './src/bqgz.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -79,22 +77,21 @@ function resolveSourceId(value) {
   return DEFAULT_SOURCE_ID;
 }
 
-const PROVIDERS = { qimao, qidian, hongxiu, faloo, dbxsd, kuwo };
+const PROVIDERS = { qimao, shoujixs, byqg, bqgz };
 
 function providerOf(sourceId) {
   return PROVIDERS[sourceId] || qimao;
 }
 
 function allowsSlugId(sourceId) {
-  return sourceId === 'dbxsd';
+  return sourceId === 'byqg';
 }
 
 const COVER_HOSTS = new Set([
   'cdn.wtzw.com',
-  'bookcover.yuewen.com',
-  'openbookcover.yuewen.com',
-  'img.faloo.com',
-  'www.dbxsd.com',
+  'images.shoujixs.net',
+  'www.bqgz.cc',
+  'www.pansosou.cn',
 ]);
 
 const coverCache = new Map();
@@ -231,7 +228,9 @@ async function handleApi(req, res, url) {
     const fallback = resolveSourceId(params.get('source'));
     const target = parseBookId(params.get('id'), fallback);
     const chapterId = params.get('chapterId');
-    if ((!allowsSlugId(target.sourceId) && !isNumeric(target.id)) || !isNumeric(chapterId)) return sendJson(res, req, 400, { error: '章节参数无效' });
+    if (!chapterId) return sendJson(res, req, 400, { error: '章节参数无效' });
+    const numericOnly = !allowsSlugId(target.sourceId);
+    if ((numericOnly && !isNumeric(target.id)) || (numericOnly && !isNumeric(chapterId))) return sendJson(res, req, 400, { error: '章节参数无效' });
     const content = await providerOf(target.sourceId).getChapterContent(target.id, chapterId);
     return sendJson(res, req, 200, { content });
   }

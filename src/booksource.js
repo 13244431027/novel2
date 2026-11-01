@@ -1,6 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import url from 'node:url';
+import { SECTIONS as SHOUJIXS_SECTIONS } from './shoujixs.js';
+import { SECTIONS as BYQG_SECTIONS } from './byqg.js';
+import { SECTIONS as BQGZ_SECTIONS } from './bqgz.js';
 
 const DEFAULT_SOURCE = {
   name: '七猫小说',
@@ -9,7 +12,6 @@ const DEFAULT_SOURCE = {
 };
 
 const DEFAULT_FILE = path.join(path.dirname(url.fileURLToPath(import.meta.url)), '..', 'qimao.json');
-const QIDIAN_FILE = path.join(path.dirname(url.fileURLToPath(import.meta.url)), '..', 'qidian.json');
 
 export function loadBookSource(file = DEFAULT_FILE) {
   try {
@@ -65,52 +67,6 @@ const PUBLISH_CATEGORIES = [
 
 const PUBLISH_TAGS = [['影视原著', 539]];
 
-const HONGXIU_MALE = [
-  ['玄幻', 20001], ['奇幻', 20005], ['武侠', 20010], ['仙侠', 20014], ['都市', 20019],
-  ['现实', 20065], ['历史', 20028], ['军事', 20032], ['游戏', 20050], ['体育', 20054],
-  ['科幻', 20042], ['悬疑', 20037], ['轻小说', 20059], ['短篇', 20076],
-];
-
-const HONGXIU_FEMALE = [
-  ['现代言情', 30020], ['古代言情', 30013], ['浪漫青春', 30031], ['玄幻言情', 30001],
-  ['仙侠奇缘', 30008], ['悬疑', 30036], ['科幻空间', 30042], ['游戏竞技', 30050],
-  ['短篇小说', 30083], ['轻小说', 30055],
-];
-
-const FALOO_CATEGORIES = [
-  ['玄幻奇幻', 1], ['武侠仙侠', 6], ['同人小说', 44], ['都市言情', 4], ['军事历史', 3],
-  ['科幻网游', 2], ['恐怖灵异', 5], ['青春校园', 7], ['女生小说', 54], ['轻小说', 97], ['短篇其他', 9],
-];
-
-function catSections(list) {
-  return list.map(([name, id]) => ({ name, kind: 'category', id: `${id}:0` }));
-}
-
-const HONGXIU_SECTIONS = [
-  { key: 'male', name: '男生', items: catSections(HONGXIU_MALE) },
-  { key: 'female', name: '女生', items: [...catSections(HONGXIU_FEMALE), { name: '完本', kind: 'finish', id: 'finish' }] },
-];
-
-const FALOO_SECTIONS = [
-  { key: 'category', name: '分类', items: catSections(FALOO_CATEGORIES) },
-];
-
-const DBXSD_CATEGORIES = [
-  ['玄幻·奇幻', 'xh-qh'], ['科幻·游戏', 'kh-yx'], ['仙侠·武侠', 'xx-wx'], ['女生·言情', 'ns-yq'],
-  ['都市·娱乐', 'ds-yl'], ['历史·军事', 'ls-js'], ['悬疑·灵异', 'xy-ly'], ['耽美·纯爱', 'dm-ca'],
-  ['轻小说', 'qxs'],
-];
-
-const DBXSD_SECTIONS = [
-  {
-    key: 'category',
-    name: '分类',
-    items: DBXSD_CATEGORIES.map(([name, id]) => ({ name, kind: 'category', id })),
-  },
-];
-
-const KUWO_SECTIONS = [];
-
 function categories(list) {
   return list.map(([name, id, needCategory]) => ({ name, id, kind: 'category', needCategory: needCategory ? 1 : 0 }));
 }
@@ -137,119 +93,32 @@ export const SECTIONS = [
   },
 ];
 
-function sectionKey(title, index) {
-  if (title.includes('男频') && title.includes('榜单')) return 'male-rank';
-  if (title.includes('男频')) return 'male-category';
-  if (title.includes('女频') && title.includes('榜单')) return 'female-rank';
-  if (title.includes('女频')) return 'female-category';
-  return `section-${index}`;
-}
-
-function parseExploreItem(rawUrl) {
-  const value = String(rawUrl || '');
-  const rank = value.match(/\/majax\/rank\/([A-Za-z0-9_]+)\?/);
-  if (rank) {
-    const gender = value.match(/gender=([A-Za-z]+)/);
-    if (!gender) return null;
-    return { kind: 'rank', id: `${gender[1]}:${rank[1]}` };
-  }
-  const category = value.match(/\/majax\/category\/list\?([^"\s]+)/);
-  if (category) {
-    const query = category[1];
-    const gender = query.match(/gender=([^&"]+)/);
-    const catId = query.match(/catId=([^&"]+)/);
-    const subCatId = query.match(/subCatId=([^&"]+)/);
-    if (!gender || !catId || !subCatId) return null;
-    return { kind: 'category', id: `${gender[1]}:${catId[1]}:${subCatId[1]}` };
-  }
-  return null;
-}
-
-function buildQidianSections(config) {
-  let explore = [];
-  try {
-    explore = JSON.parse(config.exploreUrl || '[]');
-  } catch {
-    explore = [];
-  }
-  const sections = [];
-  let current = null;
-  for (const entry of explore) {
-    if (!entry || !entry.title) continue;
-    if (!entry.url) {
-      current = { key: '', name: entry.title, items: [] };
-      sections.push(current);
-      continue;
-    }
-    if (!current) {
-      current = { key: '', name: '榜单', items: [] };
-      sections.push(current);
-    }
-    const parsed = parseExploreItem(entry.url);
-    if (parsed) current.items.push({ name: entry.title, kind: parsed.kind, id: parsed.id });
-  }
-  const used = new Set();
-  sections.forEach((section, index) => {
-    let key = sectionKey(section.name, index);
-    while (used.has(key)) key += `-${index}`;
-    used.add(key);
-    section.key = key;
-  });
-  return sections.filter((section) => section.items.length);
-}
-
 export function loadSources() {
   const primary = loadBookSource();
-  const sources = [{
+  return [{
     id: 'qimao',
     name: primary.name,
     group: primary.group || 'API',
     url: primary.url,
     signKey: primary.signKey,
     sections: SECTIONS,
+  }, {
+    id: 'shoujixs',
+    name: '手机小说',
+    group: '网页源',
+    url: 'https://wap.shoujixs.net',
+    sections: SHOUJIXS_SECTIONS,
+  }, {
+    id: 'byqg',
+    name: '笔趣阁(byqg.cc)',
+    group: '网页源',
+    url: 'https://www.byqg.cc',
+    sections: BYQG_SECTIONS,
+  }, {
+    id: 'bqgz',
+    name: '笔趣阁(bqgz.cc)',
+    group: '网页源',
+    url: 'http://www.bqgz.cc',
+    sections: BQGZ_SECTIONS,
   }];
-  sources.push({
-    id: 'hongxiu',
-    name: '红袖读书',
-    group: '网页源',
-    url: 'https://m.hongxiu.com',
-    sections: HONGXIU_SECTIONS,
-  });
-  sources.push({
-    id: 'faloo',
-    name: '飞卢小说',
-    group: '网页源',
-    url: 'https://wap.faloo.com',
-    sections: FALOO_SECTIONS,
-  });
-  sources.push({
-    id: 'dbxsd',
-    name: '独步小说网',
-    group: '网页源',
-    url: 'https://www.dbxsd.com',
-    sections: DBXSD_SECTIONS,
-  });
-  sources.push({
-    id: 'kuwo',
-    name: '酷我小说',
-    group: 'API',
-    url: 'http://appi.kuwo.cn',
-    sections: KUWO_SECTIONS,
-  });
-  try {
-    const config = JSON.parse(fs.readFileSync(QIDIAN_FILE, 'utf8'));
-    const sections = buildQidianSections(config);
-    if (sections.length) {
-      sources.push({
-        id: 'qidian',
-        name: config.bookSourceName || '起点',
-        group: config.bookSourceGroup || '起点',
-        url: config.bookSourceUrl || 'https://m.qidian.com',
-        sections,
-      });
-    }
-  } catch {
-    return sources;
-  }
-  return sources;
 }
