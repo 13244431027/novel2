@@ -8,6 +8,8 @@ import * as qimao from './src/qimao.js';
 import * as shoujixs from './src/shoujixs.js';
 import * as byqg from './src/byqg.js';
 import * as bqgz from './src/bqgz.js';
+import * as yueyou from './src/yueyou.js';
+import * as d92 from './src/92dxs.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -77,7 +79,7 @@ function resolveSourceId(value) {
   return DEFAULT_SOURCE_ID;
 }
 
-const PROVIDERS = { qimao, shoujixs, byqg, bqgz };
+const PROVIDERS = { qimao, shoujixs, byqg, bqgz, yueyou, d92 };
 
 function providerOf(sourceId) {
   return PROVIDERS[sourceId] || qimao;
@@ -92,6 +94,8 @@ const COVER_HOSTS = new Set([
   'images.shoujixs.net',
   'www.bqgz.cc',
   'www.pansosou.cn',
+  'cdn.p.yueyouxs.com',
+  'm.jakxs.net',
 ]);
 
 const coverCache = new Map();

@@ -4,6 +4,8 @@ import url from 'node:url';
 import { SECTIONS as SHOUJIXS_SECTIONS } from './shoujixs.js';
 import { SECTIONS as BYQG_SECTIONS } from './byqg.js';
 import { SECTIONS as BQGZ_SECTIONS } from './bqgz.js';
+import { SECTIONS as YUEYOU_SECTIONS } from './yueyou.js';
+import { SECTIONS as D92_SECTIONS } from './92dxs.js';
 
 const DEFAULT_SOURCE = {
   name: '七猫小说',
@@ -120,5 +122,17 @@ export function loadSources() {
     group: '网页源',
     url: 'http://www.bqgz.cc',
     sections: BQGZ_SECTIONS,
+  }, {
+    id: 'yueyou',
+    name: '随心看(阅友小说)',
+    group: '网页源',
+    url: 'https://m.suixkan.com',
+    sections: YUEYOU_SECTIONS,
+  }, {
+    id: '92dxs',
+    name: '就爱读小说网',
+    group: '网页源',
+    url: 'https://m.92dxs.org',
+    sections: D92_SECTIONS,
   }];
 }

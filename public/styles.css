@@ -728,61 +728,6 @@ body.reading #reader {
   display: block;
 }
 
-@media (max-width: 480px) {
-  .reader-settings {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: auto;
-    border-radius: 16px 16px 0 0;
-    max-height: min(75vh, 620px);
-  }
-
-  .setting-row {
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-  }
-
-  .setting-row > span {
-    flex-basis: 100%;
-    font-size: 13px;
-    margin-bottom: 4px;
-  }
-
-  .stepper,
-  .seg,
-  .theme-swatches,
-  .setting-row > .switch,
-  .setting-row > button[data-toggle],
-  .reset-row {
-    flex-basis: 100%;
-    justify-content: center;
-  }
-
-  .stepper button {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .stepper .val {
-    min-width: 52px;
-    font-size: 15px;
-  }
-
-  .seg button {
-    flex: 1 1 calc(33.333% - 4px);
-    font-size: 12px;
-    padding: 4px 6px;
-    min-height: 36px;
-  }
-
-  .theme-swatches {
-    max-width: 100%;
-    justify-content: center;
-  }
-}
-
 .setting-row {
   display: flex;
   align-items: center;
@@ -1073,5 +1018,62 @@ body.reading #reader {
     right: 12px;
     bottom: 70px;
     width: min(290px, 84vw);
+  }
+}
+
+@media (max-width: 480px) {
+  .reader-settings {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    border-radius: 16px 16px 0 0;
+    max-height: min(68vh, 560px);
+    padding-bottom: calc(96px + 18px);
+  }
+
+  .setting-row {
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .setting-row > span {
+    flex-basis: 100%;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+
+  .stepper,
+  .seg,
+  .theme-swatches,
+  .setting-row > .switch,
+  .setting-row > button[data-toggle],
+  .reset-row {
+    flex-basis: 100%;
+    justify-content: center;
+  }
+
+  .stepper button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .stepper .val {
+    min-width: 52px;
+    font-size: 15px;
+  }
+
+  .reader-settings .seg button {
+    flex: 1 1 calc(33.333% - 4px);
+    min-width: 0;
+    font-size: 12px;
+    padding: 4px 6px;
+    min-height: 36px;
+  }
+
+  .theme-swatches {
+    max-width: 100%;
+    justify-content: center;
   }
 }

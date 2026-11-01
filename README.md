@@ -5,8 +5,8 @@
 
 ## 功能
 
-- **多书源切换**：顶栏下拉选择书源（七猫 / 手机小说 / 笔趣阁 / 笔趣阁(bqgz.cc)），切换后首页频道、分类、搜索与书籍数据同步切换
-- **书城首页**：男生 / 女生 / 出版图书（七猫），分类 / 排行（手机小说），全部分类（笔趣阁 / 笔趣阁(bqgz.cc)）
+- **多书源切换**：顶栏下拉选择书源（七猫 / 手机小说 / 笔趣阁 / 笔趣阁(bqgz.cc) / 随心看(阅友小说) / 就爱读小说网），切换后首页频道、分类、搜索与书籍数据同步切换
+- **书城首页**：男生 / 女生 / 出版图书（七猫），分类 / 排行（手机小说），全部分类（笔趣阁 / 笔趣阁(bqgz.cc)），男频 / 女频（随心看(阅友小说)），男生 / 女生（就爱读小说网）
 - **搜索**：按书名 / 作者搜索，分页
 - **书籍详情**：封面、简介、标签、完本状态、字数、最新章节，支持加入书架
 - **阅读器**：AES-128-CBC 解密的章节正文，上一章 / 下一章、键盘左右键翻页、目录抽屉（章节名筛选）
@@ -50,11 +50,13 @@ docker run -d --name novel-app --network host -e PORT=3100 --restart unless-stop
 ```
 qimao.json          Legado 书源（七猫小说：搜索 / 分类 / 详情 / 目录 / 正文规则）
 server.js           Node HTTP 服务：/api/* 接口 + public/ 静态资源
-src/booksource.js   书源注册与频道分类配置（七猫 + 手机小说 + 笔趣阁 + 笔趣阁(bqgz.cc)）
+src/booksource.js   书源注册与频道分类配置（七猫 + 手机小说 + 笔趣阁 + 笔趣阁(bqgz.cc) + 随心看(阅友小说) + 就爱读小说网）
 src/qimao.js        七猫 API 客户端：签名、请求重试、缓存、正文 AES 解密
 src/shoujixs.js     手机小说客户端：移动端 HTML 解析、Post 搜索、分类 / 排行、详情、目录、多页正文聚合
 src/byqg.js         笔趣阁客户端：HTML 解析、搜索、分类、详情、分页目录、正文
 src/bqgz.js         笔趣阁(bqgz.cc) 客户端：桌面端 HTML 解析、搜索、详情、目录、正文
+src/yueyou.js       随心看(阅友小说) 客户端：JSON API 搜索 / 分类 / 目录，HTML 章节分节正文
+src/92dxs.js        就爱读小说网客户端：HTML 搜索、列表、og meta 详情、AJAX 目录、正文
 public/index.html    页面骨架
 public/styles.css    样式
 public/app.js        前端 SPA（hash 路由：#/、#/search、#/book/:id、#/read/:id/:cid、#/shelf）
