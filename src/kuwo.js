@@ -90,6 +90,9 @@ function mapSearchItem(item) {
   };
 }
 
+// 酷我小说只开放搜索接口，没有可用的分类/榜单接口，因此不提供书城频道
+export const SECTIONS = [];
+
 export async function search(keyword, page = 1) {
   const data = await requestJson(`${HOST}/novels/api/book/search?keyword=${encodeURIComponent(keyword)}&pi=${page}&ps=30`);
   const list = ((data.data || [])).map((item) => mapSearchItem(item));

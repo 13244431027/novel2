@@ -6,6 +6,8 @@ import { SECTIONS as BYQG_SECTIONS } from './byqg.js';
 import { SECTIONS as BQGZ_SECTIONS } from './bqgz.js';
 import { SECTIONS as YUEYOU_SECTIONS } from './yueyou.js';
 import { SECTIONS as D92_SECTIONS } from './92dxs.js';
+import { SECTIONS as DBXSD_SECTIONS } from './dbxsd.js';
+import { SECTIONS as KUWO_SECTIONS } from './kuwo.js';
 
 const DEFAULT_SOURCE = {
   name: '七猫小说',
@@ -134,5 +136,17 @@ export function loadSources() {
     group: '网页源',
     url: 'https://m.92dxs.org',
     sections: D92_SECTIONS,
+  }, {
+    id: 'dbxsd',
+    name: '独步小说网',
+    group: '网页源',
+    url: 'https://www.dbxsd.com',
+    sections: DBXSD_SECTIONS,
+  }, {
+    id: 'kuwo',
+    name: '酷我小说',
+    group: 'API',
+    url: 'http://appi.kuwo.cn',
+    sections: KUWO_SECTIONS,
   }];
 }

@@ -10,6 +10,8 @@ import * as byqg from './src/byqg.js';
 import * as bqgz from './src/bqgz.js';
 import * as yueyou from './src/yueyou.js';
 import * as d92 from './src/92dxs.js';
+import * as dbxsd from './src/dbxsd.js';
+import * as kuwo from './src/kuwo.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.join(__dirname, 'public');
@@ -79,14 +81,14 @@ function resolveSourceId(value) {
   return DEFAULT_SOURCE_ID;
 }
 
-const PROVIDERS = { qimao, shoujixs, byqg, bqgz, yueyou, d92 };
+const PROVIDERS = { qimao, shoujixs, byqg, bqgz, yueyou, d92, dbxsd, kuwo };
 
 function providerOf(sourceId) {
   return PROVIDERS[sourceId] || qimao;
 }
 
 function allowsSlugId(sourceId) {
-  return sourceId === 'byqg';
+  return sourceId === 'byqg' || sourceId === 'dbxsd';
 }
 
 const COVER_HOSTS = new Set([
@@ -96,6 +98,8 @@ const COVER_HOSTS = new Set([
   'www.pansosou.cn',
   'cdn.p.yueyouxs.com',
   'm.jakxs.net',
+  'www.dbxsd.com',
+  'openbookcover.yuewen.com',
 ]);
 
 const coverCache = new Map();

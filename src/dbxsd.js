@@ -162,38 +162,64 @@ function categoryUrl(id, page) {
   return `${HOST}/nav/sub-${cat}-${page}.html`;
 }
 
-export async function list(kind, id, page = 1) {
-  const html = await requestText(categoryUrl(id, page));
+export const SECTIONS = [
+  {
+    key: 'category',
+    name: '分类',
+    items: Object.entries(CATEGORIES).map(([id, name]) => ({ name, kind: 'category', id })),
+  },
+];
+
+function parseListPage(html, page) {
   const list = [];
-  const re = /<a class="media-left"[^>]*href="(\/book\/[^"]+\/)"[\s\S]*?<\/a>\s*<div class="media-body">([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/g;
+  const seen = new Set();
+  const start = html.indexOf('Main Begin');
+  const end = html.indexOf('Col-left End');
+  const segment = start >= 0 ? html.slice(start, end > start ? end : undefined) : html;
+  const tableRe = /<td>\d+<\/td>\s*<td><a href="\/book\/([^"/]+)\/"[^>]*title="([^"]*)"[^>]*>([\s\S]*?)<\/a>[\s\S]*?<\/td>\s*<td>([\s\S]*?)<\/td>/g;
   let match;
-  while ((match = re.exec(html))) {
-    const href = match[1];
-    const body = match[2];
-    const id_ = String(href).replace(/^\/book\//, '').replace(/\/$/, '');
-    const cover = (body.match(/<img[^>]+src="([^"]+)"[^>]*class="book-img-small"/) || [])[1] || '';
-    const title = (body.match(/<h4><a[^>]*>([\s\S]*?)<\/a><\/h4>/) || [])[1] || '';
-    const intro = (body.match(/class="media-info">([\s\S]*)$/) || [])[1] || '';
-    const item = {
-      id: id_,
-      title: stripInline(title),
-      author: '',
-      intro: stripTags(intro).slice(0, 120),
-      cover: absoluteUrl(cover) || coverById(id_, 180),
+  while ((match = tableRe.exec(segment))) {
+    if (seen.has(match[1])) continue;
+    seen.add(match[1]);
+    const title = stripInline(match[2] || match[3]);
+    if (!title) continue;
+    list.push({
+      id: match[1],
+      title,
+      author: stripInline(match[4]),
+      intro: '',
+      cover: coverById(match[1], 180),
       tags: [],
       words: 0,
       score: '',
-    };
-    if (item.title) list.push(item);
+    });
   }
-  const maxPage = (html.match(/sub-[^"']+-(\d+)\.html/g) || [])
-    .map((u) => Number(u.match(/(\d+)\.html/)[1]))
-    .reduce((max, n) => Math.max(max, n), 1);
-  return {
-    list,
-    totalPages: maxPage,
-    page,
-  };
+  const cardRe = /<a class="media-left" href="\/book\/([^"/]+)\/"[^>]*>\s*<img class="book-img-small" src="([^"]+)"[^>]*>[\s\S]*?<h4><a [^>]*>([\s\S]*?)<\/a><\/h4>[\s\S]*?<div class="media-info">([\s\S]*?)<\/div>/g;
+  while ((match = cardRe.exec(segment))) {
+    if (seen.has(match[1])) continue;
+    seen.add(match[1]);
+    const title = stripInline(match[3]);
+    if (!title) continue;
+    list.push({
+      id: match[1],
+      title,
+      author: '',
+      intro: stripTags(match[4]).slice(0, 120),
+      cover: absoluteUrl(match[2]) || coverById(match[1], 180),
+      tags: [],
+      words: 0,
+      score: '',
+    });
+  }
+  // 该站翻页条只滚动展示当前页前后几页，首屏更是只留一个 more 链接，
+  // 无法一次拿到真实总页数；返回 0 表示“还有下一页但总页数未知”。
+  return { list, totalPages: list.length ? (pageNumbers.length ? Math.max(page, ...pageNumbers) : 0) : page };
+}
+
+export async function list(kind, id, page = 1) {
+  const html = await requestText(categoryUrl(id, page));
+  const parsed = parseListPage(html, page);
+  return { list: parsed.list, totalPages: parsed.totalPages, page };
 }
 
 export async function getBook(id) {
