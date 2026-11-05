@@ -213,7 +213,7 @@ function parseListPage(html, page) {
   }
   // 该站翻页条只滚动展示当前页前后几页，首屏更是只留一个 more 链接，
   // 无法一次拿到真实总页数；返回 0 表示“还有下一页但总页数未知”。
-  return { list, totalPages: list.length ? (pageNumbers.length ? Math.max(page, ...pageNumbers) : 0) : page };
+  return { list, totalPages: list.length ? 0 : page };
 }
 
 export async function list(kind, id, page = 1) {
